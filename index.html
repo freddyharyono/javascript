@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Menampilkan Negara dari IP dengan geojs.io</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div>
+    <label for="ip-input">Masukkan IP address:</label><br><br>
+    <input type="text" id="ip-input" placeholder="Contoh: 202.44.12.1"><br><br>
+    <button id="ip-button">Cari Negara</button>
+    <div id="ip-info"></div>
+  </div>
+
+  
+  <script>
+    const ipInput = document.getElementById('ip-input');
+    const ipButton = document.getElementById('ip-button');
+    const ipInfo = document.getElementById('ip-info');
+
+    // Fungsi untuk menampilkan pesan "loading"
+    const showLoading = () => {
+      ipButton.disabled = true;
+      ipInput.disabled = true;
+      ipButton.innerHTML = 'Loading...';
+    };
+
+    // Fungsi untuk mengambil informasi IP dari API geojs.io
+    const getIpInfo = ip => {
+      showLoading();
+
+      fetch(`https://get.geojs.io/v1/ip/geo/${ip}.json`)
+        .then(response => response.json())
+        .then(data => {
+          // Menampilkan informasi IP dan negara pada elemen <div>
+          ipInfo.innerHTML = `
+            <p>IP Address: ${data.ip}</p>
+            <p>Negara: ${data.country}</p>
+          `;
+        })
+        .catch(error => {
+          // Menampilkan pesan error jika permintaan gagal
+          console.error(error);
+          ipInfo.innerHTML = `
+            <p>Terjadi kesalahan saat mengambil informasi IP.</p>
+          `;
+        })
+        .finally(() => {
+          // Mengembalikan input dan tombol ke kondisi semula setelah permintaan selesai
+          ipButton.disabled = false;
+          ipInput.disabled = false;
+          ipButton.innerHTML = 'Cari Negara';
+        });
+    };
+
+    // Menjalankan fungsi getIpInfo saat tombol ditekan
+    ipButton.addEventListener('click', () => {
+      const ip = ipInput.value;
+      if (ip) {
+        getIpInfo(ip);
+      }
+    });
+  </script>
+</body>
+</html>
